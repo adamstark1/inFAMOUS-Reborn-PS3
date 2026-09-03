@@ -26,3 +26,6 @@
 /Users/adamstark/Desktop/Development/inFAMOUSReborn/obj/Debug/net8.0/inFAMOUSReborn.pdb
 /Users/adamstark/Desktop/Development/inFAMOUSReborn/obj/Debug/net8.0/inFAMOUSReborn.genruntimeconfig.cache
 /Users/adamstark/Desktop/Development/inFAMOUSReborn/obj/Debug/net8.0/ref/inFAMOUSReborn.dll
+/Users/adamstark/Desktop/Development/inFAMOUSReborn/bin/Debug/net8.0/Missions/base/_id_to_filename.json
+/Users/adamstark/Desktop/Development/inFAMOUSReborn/bin/Debug/net8.0/Missions/fob/_id_to_filename.json
+/Users/adamstark/Desktop/Development/inFAMOUSReborn/obj/Debug/net8.0/inFAMOUSReborn.sourcelink.json

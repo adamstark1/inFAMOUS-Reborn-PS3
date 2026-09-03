@@ -9,6 +9,9 @@ builder.Services.AddSingleton<MissionCatalog>();
 
 var app = builder.Build();
 
+// Load missions
+app.Services.GetRequiredService<MissionCatalog>();
+
 // Configure static file serving for .ium mission files
 var missionsPath = Path.Combine(Directory.GetCurrentDirectory(), "Missions");
 if (!Directory.Exists(missionsPath))
@@ -33,13 +36,14 @@ app.MapGet("/fob/config.json", () => Results.Json(new
     version = "1.0"
 }));
 
-// Mission list endpoint (serves parsed metadata directly from RAM)
+// Mission list endpoint
 app.MapGet("/api/missions", (MissionCatalog catalog) => 
 {
-    var allMissions = catalog.GetAllMissions();
+    var allMissions = catalog.GetAllMissions().ToList();
+    
     return Results.Json(new
     {
-        total = allMissions.Count(),
+        total = allMissions.Count,
         page = 1,
         missions = allMissions
     });

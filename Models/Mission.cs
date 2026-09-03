@@ -21,7 +21,7 @@ public class Mission
 
     [JsonPropertyName("playtotal")]
     public int PlayTotal { get; set; }
-    
+
     [JsonPropertyName("dataUrl")]
     public string DataUrl { get; set; } = string.Empty;
 }

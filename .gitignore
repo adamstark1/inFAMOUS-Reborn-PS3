@@ -1,0 +1,5 @@
+*.zip
+Missions/FoB/
+Missions/Two/
+.idea
+.bin
