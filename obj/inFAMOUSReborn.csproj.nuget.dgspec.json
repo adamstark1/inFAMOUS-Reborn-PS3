@@ -1,0 +1,70 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/adamstark/Desktop/Development/inFAMOUSReborn/inFAMOUSReborn.csproj": {}
+  },
+  "projects": {
+    "/Users/adamstark/Desktop/Development/inFAMOUSReborn/inFAMOUSReborn.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/adamstark/Desktop/Development/inFAMOUSReborn/inFAMOUSReborn.csproj",
+        "projectName": "inFAMOUSReborn",
+        "projectPath": "/Users/adamstark/Desktop/Development/inFAMOUSReborn/inFAMOUSReborn.csproj",
+        "packagesPath": "/Users/adamstark/.nuget/packages/",
+        "outputPath": "/Users/adamstark/Desktop/Development/inFAMOUSReborn/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/adamstark/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "DNS": {
+              "target": "Package",
+              "version": "[*, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.125/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
