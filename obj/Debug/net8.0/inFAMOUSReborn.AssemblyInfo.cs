@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("inFAMOUSReborn")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+351e8ca1f1398de34d7aee4481636e100f007e33")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e5d59c76616e4a542a52d46e478d3650dcb971ec")]
 [assembly: System.Reflection.AssemblyProductAttribute("inFAMOUSReborn")]
 [assembly: System.Reflection.AssemblyTitleAttribute("inFAMOUSReborn")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
