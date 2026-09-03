@@ -8,7 +8,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5190d65b-5a3a-4135-adb9-2665399f6548" name="Changes" comment="" />
+    <list default="true" id="5190d65b-5a3a-4135-adb9-2665399f6548" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.inFAMOUSReborn.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.inFAMOUSReborn.dir/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Services/DNSProxyService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/DNSProxyService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inFAMOUSReborn.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/inFAMOUSReborn.csproj" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -19,6 +24,7 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Services/DNSProxyService.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Services/MissionCatalog.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 5,
@@ -36,7 +42,7 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "feat/dns-listener",
+    "git-widget-placeholder": "feat/database-setup",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -119,7 +125,7 @@
       <option name="presentableId" value="Default" />
       <updated>1788438117411</updated>
       <workItem from="1788438118637" duration="302000" />
-      <workItem from="1788438494674" duration="703000" />
+      <workItem from="1788438494674" duration="3533000" />
     </task>
     <servers />
   </component>

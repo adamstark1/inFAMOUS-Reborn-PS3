@@ -24,9 +24,10 @@ public class DnsProxyService : BackgroundService
         
         var masterFile = new MasterFile();
     
-        // Redirect Socker Punch and Cloudfront to local IP
+        // Reroute Socker Punch and Cloudfront to local IP
         masterFile.AddIPAddressResourceRecord(new Domain("infamous2-release.ps3.online.scea.com"), localIpAddress);
         masterFile.AddIPAddressResourceRecord(new Domain("dbhhpqias9rrc.cloudfront.net"), localIpAddress);
+        masterFile.AddIPAddressResourceRecord(new Domain("r2.infamousreborn.com"), localIpAddress);
         
         _server = new DnsServer(masterFile, "8.8.8.8");
 

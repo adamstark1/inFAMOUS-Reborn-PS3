@@ -10,4 +10,9 @@
     <PackageReference Include="DNS" Version="*" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Missions\fob\" />
+    <Folder Include="Missions\base\" />
+  </ItemGroup>
+
 </Project>
