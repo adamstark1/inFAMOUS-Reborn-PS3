@@ -17,7 +17,6 @@ public class MissionCatalog
 
     private void LoadCatalogs()
     {
-        // A Missions mappa elérési útjának meghatározása
         var missionsDir = Path.Combine(Directory.GetCurrentDirectory(), "Missions");
         
         var baseFile = Path.Combine(missionsDir, "ugc_missions_base.json.gz");

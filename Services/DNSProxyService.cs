@@ -1,7 +1,6 @@
-using DNS.Protocol;
 using System.Net;
 using System.Net.Sockets;
-using DNS.Client.RequestResolver;
+using DNS.Protocol;
 using DNS.Server;
 
 namespace inFAMOUSReborn.Services;
@@ -18,31 +17,38 @@ public class DnsProxyService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        // Get local IP
         string localIp = GetLocalIPAddress();
         IPAddress localIpAddress = IPAddress.Parse(localIp);
         
         var masterFile = new MasterFile();
-    
-        // Reroute Socker Punch and Cloudfront to local IP
-        masterFile.AddIPAddressResourceRecord(new Domain("infamous2-release.ps3.online.scea.com"), localIpAddress);
-        masterFile.AddIPAddressResourceRecord(new Domain("dbhhpqias9rrc.cloudfront.net"), localIpAddress);
-        masterFile.AddIPAddressResourceRecord(new Domain("r2.infamousreborn.com"), localIpAddress);
+        
+        string[] domains = {
+            "infamous2-release.ps3.online.scea.com",
+            "infamous2-release.ps3.online.scea.com.",
+            "dbhhpqias9rrc.cloudfront.net",
+            "dbhhpqias9rrc.cloudfront.net.",
+            "r2.infamousreborn.com",
+            "r2.infamousreborn.com."
+        };
+
+        foreach (var domain in domains)
+        {
+            masterFile.AddIPAddressResourceRecord(new Domain(domain), localIpAddress);
+        }
         
         _server = new DnsServer(masterFile, "8.8.8.8");
 
         _logger.LogInformation("==================================================");
-        _logger.LogInformation($"inFAMOUS Reborn is running. IP: {localIp}");
+        _logger.LogInformation($"inFAMOUS Reborn DNS Proxy is running. IP: {localIp}");
         _logger.LogInformation("==================================================");
 
         try
         {
-            // Open Port 53
-            _server.Listen(53);
+            await _server.Listen(53, IPAddress.Any);
         }
         catch (SocketException ex)
         {
-            _logger.LogError($"[Errör] Couldn't open Port 53. Try running with sudo/admin. ({ex.Message})");
+            _logger.LogError($"[Error] Couldn't open Port 53. Run with sudo. ({ex.Message})");
         }
         
         await Task.Delay(Timeout.Infinite, stoppingToken);
