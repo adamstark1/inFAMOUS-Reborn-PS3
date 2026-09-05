@@ -17,7 +17,7 @@ public class MissionCatalog
 
     private void LoadCatalogs()
     {
-        var missionsDir = Path.Combine(Directory.GetCurrentDirectory(), "Missions");
+        var missionsDir = PathHelper.GetMissionsDirectory();
         
         var baseFile = Path.Combine(missionsDir, "ugc_missions_base.json.gz");
         var fobFile = Path.Combine(missionsDir, "ugc_missions_fob.json.gz");

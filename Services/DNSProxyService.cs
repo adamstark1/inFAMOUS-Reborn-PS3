@@ -5,12 +5,12 @@ using DNS.Server;
 
 namespace inFAMOUSReborn.Services;
 
-public class DnsProxyService : BackgroundService
+public class DNSProxyService : BackgroundService
 {
-    private readonly ILogger<DnsProxyService> _logger;
+    private readonly ILogger<DNSProxyService> _logger;
     private DnsServer? _server;
 
-    public DnsProxyService(ILogger<DnsProxyService> logger)
+    public DNSProxyService(ILogger<DNSProxyService> logger)
     {
         _logger = logger;
     }
@@ -39,7 +39,8 @@ public class DnsProxyService : BackgroundService
         _server = new DnsServer(masterFile, "8.8.8.8");
 
         _logger.LogInformation("==================================================");
-        _logger.LogInformation($"inFAMOUS Reborn DNS Proxy is running. IP: {localIp}");
+        _logger.LogInformation($"inFAMOUS Reborn DNS Proxy is running.");
+        _logger.LogInformation($"IP: {localIp}");
         _logger.LogInformation("==================================================");
 
         try

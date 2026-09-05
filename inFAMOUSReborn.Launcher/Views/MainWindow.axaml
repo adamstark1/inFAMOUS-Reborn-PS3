@@ -1,0 +1,68 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:inFAMOUSReborn.Launcher.ViewModels"
+        mc:Ignorable="d" Width="800" Height="600" CanResize="False"
+        x:Class="inFAMOUSReborn.Launcher.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/icon.ico"
+        Title="inFAMOUS Reborn Launcher v1.0.0"
+        Background="#121212" Foreground="#E0E0E0"
+        FontFamily="Helvetica, Arial, sans-serif">
+
+    <Window.Styles>
+        <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#333333" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        
+        <Style Selector="Button:disabled /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#555555" />
+            <Setter Property="Foreground" Value="#CCCCCC" />
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="Auto, *, 200">
+        
+        <Border BorderBrush="#333333" BorderThickness="0,0,0,1" Grid.Row="0" Padding="20">
+            <StackPanel Orientation="Horizontal" Spacing="15" VerticalAlignment="Center">
+                <TextBlock FontSize="24" FontWeight="Bold" Foreground="#FFFFFF" Text="{Binding CurrentStepText}"/>
+                <Border Background="#333333" CornerRadius="4" IsVisible="{Binding IsOptional}" Padding="6,2">
+                    <TextBlock FontSize="11" FontWeight="Bold" Foreground="#AAAAAA" Text="OPTIONAL" VerticalAlignment="Center"/>
+                </Border>
+            </StackPanel>
+        </Border>
+        
+        <Grid Grid.Row="1">
+            <StackPanel HorizontalAlignment="Center" Spacing="20" VerticalAlignment="Center">
+                <TextBlock FontSize="16" MaxWidth="600" Text="{Binding StepDescription}" TextAlignment="Center" TextWrapping="Wrap"/>
+                
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="15">
+                    <Button Background="#FFFFFF" Command="{Binding ExecutePrimaryActionCommand}" Content="{Binding PrimaryButtonText}" CornerRadius="4" FontWeight="Bold" Foreground="#000000" Padding="30,12"/>
+                    
+                    <Button Background="Transparent" BorderBrush="#888888" BorderThickness="1" Command="{Binding SkipStepCommand}" Content="Skip" CornerRadius="4" FontWeight="Bold" Foreground="#888888" IsVisible="{Binding IsOptional}" Padding="20,12"/>
+                </StackPanel>
+                
+                <StackPanel HorizontalAlignment="Center" IsVisible="{Binding IsReadmeLinkVisible}" Margin="0,10,0,0" Orientation="Horizontal">
+                    <TextBlock FontSize="12" Foreground="#AAAAAA" Text="Stuck on this step? " VerticalAlignment="Center"/>
+                    <Button Classes="link" Background="Transparent" BorderThickness="0" Command="{Binding OpenReadmeCommand}" Content="Refer to the README." Cursor="Hand" FontSize="12" Foreground="#4DA6FF" Padding="0" VerticalAlignment="Center"/>
+                </StackPanel>
+            </StackPanel>
+            
+            <TextBlock Text="Made by Adam Stark" Foreground="#444444" FontSize="10" 
+                       HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="15"/>
+        </Grid>
+        
+        <Border Background="#0A0A0A" BorderBrush="#333333" BorderThickness="0,1,0,0" Grid.Row="2">
+            <Grid>
+                <ScrollViewer x:Name="TerminalScroll">
+                    <SelectableTextBlock FontFamily="Consolas, Monaco, monospace" FontSize="12" Foreground="#AAAAAA" Padding="15" Text="{Binding TerminalOutput}" TextWrapping="Wrap"/>
+                </ScrollViewer>
+                
+                <Button Command="{Binding CopyLogCommand}" Content="Copy" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="10" Background="#333333" Foreground="#FFFFFF" Padding="15,6" CornerRadius="4" Cursor="Hand" FontSize="12" FontWeight="Bold" ToolTip.Tip="Copy to clipboard"/>
+            </Grid>
+        </Border>
+        
+    </Grid>
+</Window>

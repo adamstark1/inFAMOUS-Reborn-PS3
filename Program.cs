@@ -6,17 +6,18 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 
 var builder = WebApplication.CreateBuilder(args);
+string pfxPath = Path.Combine(AppContext.BaseDirectory, "infamous.pfx");
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
     serverOptions.ListenAnyIP(80);
     serverOptions.ListenAnyIP(443, listenOptions =>
     {
-        listenOptions.UseHttps("infamous.pfx", "password123");
+        listenOptions.UseHttps(pfxPath, "password123");
     });
 });
 
-builder.Services.AddHostedService<DnsProxyService>();
+builder.Services.AddHostedService<DNSProxyService>();
 builder.Services.AddSingleton<MissionCatalog>();
 
 var app = builder.Build();
@@ -29,7 +30,7 @@ app.Use(async (context, next) =>
 
 app.Services.GetRequiredService<MissionCatalog>();
 
-var missionsPath = Path.Combine(Directory.GetCurrentDirectory(), "Missions");
+var missionsPath = PathHelper.GetMissionsDirectory();
 if (!Directory.Exists(missionsPath))
 {
     Directory.CreateDirectory(missionsPath);
@@ -88,7 +89,7 @@ string GetRealMissionId(Mission m, string worldFolder)
         return cachedId;
     }
 
-    string baseFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "Missions", worldFolder);
+    string baseFolderPath = Path.Combine(PathHelper.GetMissionsDirectory(), worldFolder);
     string[] possibleNames = { $"{title} - {author}.ium", $"{title}.ium" };
     string foundPath = null;
 
@@ -254,7 +255,6 @@ app.MapGet("/{fileName}", (HttpContext context, string fileName, MissionCatalog 
     }
 
     string requestedId = fileName.Replace(".ium", "", StringComparison.OrdinalIgnoreCase);
-
     string worldHeader = context.Request.Headers["world"].ToString();
     string worldFolder = (worldHeader == "1") ? "fob" : "base";
 
@@ -272,13 +272,9 @@ app.MapGet("/{fileName}", (HttpContext context, string fileName, MissionCatalog 
 
     string title = mission.Title ?? "";
     string author = mission.Author ?? "";
-
-    string baseFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "Missions", worldFolder);
+    string baseFolderPath = Path.Combine(PathHelper.GetMissionsDirectory(), worldFolder);
     
-    string[] possibleNames = {
-        $"{title} - {author}.ium",
-        $"{title}.ium"
-    };
+    string[] possibleNames = { $"{title} - {author}.ium", $"{title}.ium" };
 
     foreach (var name in possibleNames)
     {
@@ -305,13 +301,11 @@ app.MapGet("/{fileName}", (HttpContext context, string fileName, MissionCatalog 
 var buildMissionObject = (Mission m, string worldFolder) =>
 {
     var id = GetRealMissionId(m, worldFolder);
-
     string title = m.Title ?? "Unknown Mission";
     string caption = m.Caption ?? "";
     string creator = m.Creator ?? "Unknown Author";
     string author = !string.IsNullOrEmpty(m.Author) ? m.Author : creator;
     string slottablepacks = m.SlotTablePacks ?? "";
-
     string posX = !string.IsNullOrEmpty(m.PositionX) ? m.PositionX : "0.000000";
     string posY = !string.IsNullOrEmpty(m.PositionY) ? m.PositionY : "0.000000";
     string posZ = !string.IsNullOrEmpty(m.PositionZ) ? m.PositionZ : "0.000000";
@@ -344,30 +338,50 @@ var buildMissionObject = (Mission m, string worldFolder) =>
 var buildMissionListResponse = (IEnumerable<Mission> missionsToServe, string worldFolder) =>
 {
     var resultMissions = missionsToServe.Select(m => buildMissionObject(m, worldFolder)).ToList();
-
     var responseObj = new
     {
         missions = resultMissions,
         missionCount = resultMissions.Count
     };
 
+    /*
     string jsonString = JsonSerializer.Serialize(responseObj, new JsonSerializerOptions { WriteIndented = true });
     Console.WriteLine("\n=== OUTGOING JSON RESPONSE TO PS3 ===");
     Console.WriteLine(jsonString);
     Console.WriteLine("=====================================\n");
+    */
 
     return Results.Json(responseObj);
 };
 
+IEnumerable<Mission> GetValidMissionsForWorld(MissionCatalog catalog, string worldFolder)
+{
+    string baseFolderPath = Path.Combine(PathHelper.GetMissionsDirectory(), worldFolder);
+    return catalog.GetAllMissions().Where(m =>
+    {
+        string title = m.Title ?? "Unknown";
+        string author = m.Author ?? "Unknown";
+        
+        string[] possibleNames = { $"{title} - {author}.ium", $"{title}.ium" };
+        foreach (var name in possibleNames)
+        {
+            if (File.Exists(Path.Combine(baseFolderPath, name))) return true;
+            string cleanName = string.Join("_", name.Split(Path.GetInvalidFileNameChars()));
+            if (File.Exists(Path.Combine(baseFolderPath, cleanName))) return true;
+        }
+        return false;
+    });
+}
+
 app.MapGet("/i2/static/initial.json", (MissionCatalog catalog) => 
 {
-    var initialMissions = catalog.GetAllMissions().Take(32).ToList();
+    var initialMissions = GetValidMissionsForWorld(catalog, "base").Take(32).ToList();
     return buildMissionListResponse(initialMissions, "base");
 });
 
 app.MapGet("/fob/static/initial.json", (MissionCatalog catalog) => 
 {
-    var initialMissions = catalog.GetAllMissions().Take(32).ToList();
+    var initialMissions = GetValidMissionsForWorld(catalog, "fob").Take(32).ToList();
     return buildMissionListResponse(initialMissions, "fob");
 });
 
@@ -382,8 +396,8 @@ var handleSearch = async (HttpContext context, MissionCatalog catalog) =>
 
     string worldHeader = context.Request.Headers["world"].ToString();
     string worldFolder = (worldHeader == "1") ? "fob" : "base";
-
-    var allMissions = catalog.GetAllMissions().ToList();
+    
+    var allMissions = GetValidMissionsForWorld(catalog, worldFolder);
     
     if (!string.IsNullOrEmpty(searchTerm))
     {
@@ -391,67 +405,49 @@ var handleSearch = async (HttpContext context, MissionCatalog catalog) =>
             (m.Title?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false) ||
             (m.Author?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false) ||
             m.Id.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-        ).Take(32).ToList();
-    }
-    else
-    {
-        allMissions = allMissions.Take(32).ToList();
+        );
     }
 
-    return buildMissionListResponse(allMissions, worldFolder);
+    return buildMissionListResponse(allMissions.Take(32).ToList(), worldFolder);
 };
 
 app.MapPost("/api/missions/search/index.json", handleSearch);
 app.MapGet("/api/missions/search/index.json", handleSearch);
+
+app.MapGet("/api/missions/all/index.json", (HttpContext context, MissionCatalog catalog) => 
+{
+    string worldHeader = context.Request.Headers["world"].ToString();
+    string worldFolder = (worldHeader == "1") ? "fob" : "base";
+
+    var allMissions = GetValidMissionsForWorld(catalog, worldFolder).Take(32).ToList();
+
+    return buildMissionListResponse(allMissions, worldFolder);
+});
 
 app.MapGet("/api/mission/ugc/{uuid}/header.json", (HttpContext context, string uuid, MissionCatalog catalog) => 
 {
     string worldHeader = context.Request.Headers["world"].ToString();
     string worldFolder = (worldHeader == "1") ? "fob" : "base";
 
-    var mission = catalog.GetAllMissions().FirstOrDefault(m => 
+    var mission = GetValidMissionsForWorld(catalog, worldFolder).FirstOrDefault(m => 
         string.Equals(GetRealMissionId(m, worldFolder), uuid, StringComparison.OrdinalIgnoreCase));
 
     if (mission != null) 
     {
-        return Results.Json(new
-        {
-            missions = new object[] { buildMissionObject(mission, worldFolder) },
-            missionCount = 1
-        });
+        return Results.Json(new { missions = new object[] { buildMissionObject(mission, worldFolder) }, missionCount = 1 });
     }
 
-    return Results.Json(new
-    {
-        missions = new object[] {},
-        missionCount = 0
-    });
+    return Results.Json(new { missions = new object[] {}, missionCount = 0 });
 });
 
-app.MapPost("/api/ticket/login", () => Results.Json(new
-{
-    token = "mock-session-token-12345",
-    account_id = "123456789",
-    psn_name = "AdamStark",
-    status = "success"
-}));
-
-app.MapGet("/api/ticket/login", () => Results.Json(new
-{
-    token = "mock-session-token-12345",
-    account_id = "123456789",
-    psn_name = "AdamStark",
-    status = "success"
-}));
+app.MapPost("/api/ticket/login", () => Results.Json(new { token = "mock-session-token-12345", account_id = "123456789", psn_name = "AdamStark", status = "success" }));
+app.MapGet("/api/ticket/login", () => Results.Json(new { token = "mock-session-token-12345", account_id = "123456789", psn_name = "AdamStark", status = "success" }));
 
 app.MapGet("/api/missions/my/favorites/index.json", () => Results.Json(new { missions = new object[] {}, missionCount = 0 }));
 app.MapGet("/api/missions/my/queue/index.json", () => Results.Json(new { missions = new object[] {}, missionCount = 0 }));
 app.MapGet("/api/missions/my/played/index.json", () => Results.Json(new { missions = new object[] {}, missionCount = 0 }));
 app.MapGet("/api/missions/my/uploaded/index.json", () => Results.Json(new { missions = new object[] {}, missionCount = 0 }));
 
-app.MapFallback((HttpContext context) => 
-{
-    return Results.Json(new { status = "ok" });
-});
+app.MapFallback((HttpContext context) => Results.Json(new { status = "ok" }));
 
 app.Run();

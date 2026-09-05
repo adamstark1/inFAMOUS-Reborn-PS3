@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="DNS" Version="*" />
   </ItemGroup>
 
@@ -15,4 +16,16 @@
     <Folder Include="Missions\base\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="inFAMOUSReborn.Launcher\**" />
+    <EmbeddedResource Remove="inFAMOUSReborn.Launcher\**" />
+    <None Remove="inFAMOUSReborn.Launcher\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="infamous.pfx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  
 </Project>

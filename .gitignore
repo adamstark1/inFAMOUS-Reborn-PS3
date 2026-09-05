@@ -1,6 +1,18 @@
+.idea/
+.vs/
+*.user
+
+bin/
+obj/
+
+.DS_Store
+*.DS_Store
+
+inFAMOUS Reborn.app/
+inFAMOUS Reborn Windows/
+ReleaseBuild/
+temp_*/
 *.zip
-Missions/FoB/
-Missions/Two/
-.idea
-.bin
-.DS_STORE
+
+Missions/base/
+Missions/fob/
