@@ -5,7 +5,7 @@ Please leave a star ⭐ if you found this repository helpful!
 
 A cross-platform custom server and launcher to restore User-Generated Content (UGC) functionality for **inFAMOUS 2** and **inFAMOUS: Festival of Blood** on the PlayStation 3.
 
-| BEFORE | AFTER |
+| BEFORE: UGC Error | AFTER: UGC Online |
 | :---: | :---: |
 | <img src="Resources/base-before.png" width="700"> | <img src="Resources/base-after.png" width="700"> |
 
@@ -13,7 +13,7 @@ These screenshots are from inFAMOUS 2. I achieved the same result for inFAMOUS: 
 
 ## Download
 You can download the compiled versions for your operating system here:  
-**[Download Latest Release.](LINK_TO_YOUR_GITHUB_RELEASES_PAGE_HERE)**
+**[Download Latest Release.](https://github.com/adamstark1/inFAMOUS-Reborn-PS3/releases)**
 
 | UI Screenshot |
 | :---: |
