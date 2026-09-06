@@ -1,5 +1,6 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Name="inFAMOUS Reborn"
              x:Class="inFAMOUSReborn.Launcher.App"
              xmlns:local="using:inFAMOUSReborn.Launcher"
              RequestedThemeVariant="Default">
