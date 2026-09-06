@@ -1,7 +1,6 @@
 # inFAMOUS Reborn PS3
 > [!IMPORTANT]
-> This project brings back **205,364 missions** in total, supporting both games.  
-Please leave a star ⭐ if you found this repository helpful!
+> This project brings back **205,364 missions** in total, supporting inFAMOUS 2 and inFAMOUS: Festival of Blood.
 
 A cross-platform custom server and launcher to restore User-Generated Content (UGC) functionality for **inFAMOUS 2** and **inFAMOUS: Festival of Blood** on the PlayStation 3.
 
@@ -12,6 +11,7 @@ A cross-platform custom server and launcher to restore User-Generated Content (U
 These screenshots are from inFAMOUS 2. I achieved the same result for inFAMOUS: Festival of Blood as well.
 
 ## Download
+**Please leave a star ⭐ if you found this repository helpful!**  
 You can download the compiled versions for your operating system here:  
 **[Download Latest Release.](https://github.com/adamstark1/inFAMOUS-Reborn-PS3/releases)**
 
@@ -47,6 +47,11 @@ You can download the compiled versions for your operating system here:
 4. **Optional Step:** Open the **Internet Browser** on your PS3 and head to http://infamous2-release.ps3.online.scea.com/. If you see my message, you're perfectly set.
 5. **Start Server:** Once the files are ready, click "Start Server". The terminal will display if the missions loaded successfully and your local IP address. Boot the game.
 
+## Tips
+Fastest way to get all 3 UGC related trophies for **inFAMOUS 2**:
+- Set **Mission Filters** to **Newest**, **Any**, **Any**.
+- Search for **"2 fast trophies"** and replay the mission 25 times.
+
 ## Troubleshooting
 
 > **"The mission download fails or times out"**  
@@ -65,8 +70,8 @@ Incorrect structure: `Missions/base/maps_by_name/[mission files]` (Remove the `m
 
 >**"Port 53 or Port 80 in use / Server fails to start"**  
 If the built-in port clearer fails, manually kill the conflicting processes:
-* **macOS:** Open Terminal and run `sudo killall httpd` and `sudo killall -HUP mDNSResponder`.
-* **Windows:** Open Command Prompt as Administrator and run `net stop sharedaccess`. Also ensure Skype or IIS are not running.
+* **macOS:** Open Terminal and run `sudo kill -9 $(sudo lsof -t -i :80)`.
+* **Windows:** Open Command Prompt as Administrator and run `for /f "tokens=5" %a in ('netstat -aon ^| findstr :80 ^| findstr LISTENING') do taskkill /f /pid %a`.
 
 ## Tech Stack
 
