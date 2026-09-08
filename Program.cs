@@ -136,7 +136,7 @@ app.MapGet("/fob/config.json", () => Results.Json(new
     mode = "on",
     protover = 2,
     protover_max = 2,
-    initiallisturl = "/fob/static/initial.json",
+    initiallisturl = "/fob/static/initial.json?",
     xpcap_dt_min = 0.0,
     xpcap_dt_max = 600.0,
     xpcap_xp_min = 25.0,
@@ -186,7 +186,7 @@ app.MapGet("/i2/config.json", () => Results.Json(new
     mode = "on",
     protover = 2,
     protover_max = 2,
-    initiallisturl = "/i2/static/initial.json",
+    initiallisturl = "/i2/static/initial.json?",
     xpcap_dt_min = 0.0,
     xpcap_dt_max = 600.0,
     xpcap_xp_min = 25.0,
@@ -246,6 +246,18 @@ app.MapGet("/i2/config.json", () => Results.Json(new
         new { file = "ugc/missions/tp/ugc_template_searchandrescue.ium", url = "/i2/static/templates/ugc_template_searchandrescue.ium", ver = 2 }
     }
 }));
+
+app.MapGet("/i2/static/packs/{packName}", (string packName) => 
+    Results.Bytes(Array.Empty<byte>(), "application/octet-stream"));
+
+app.MapGet("/fob/static/packs/{packName}", (string packName) => 
+    Results.Bytes(Array.Empty<byte>(), "application/octet-stream"));
+
+app.MapGet("/i2/static/templates/{templateName}", (string templateName) => 
+    Results.Bytes(Array.Empty<byte>(), "application/octet-stream"));
+
+app.MapGet("/fob/static/templates/{templateName}", (string templateName) => 
+    Results.Bytes(Array.Empty<byte>(), "application/octet-stream"));
 
 app.MapGet("/{fileName}", (HttpContext context, string fileName, MissionCatalog catalog) => 
 {
