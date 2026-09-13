@@ -6,28 +6,30 @@ A cross-platform custom server and launcher to restore User-Generated Content (U
 
 | BEFORE: UGC Error | AFTER: UGC Online |
 | :---: | :---: |
-| <img src="Resources/base-before.png" width="700"> | <img src="Resources/base-after.png" width="700"> |
+| <img src="Assets/base-before.png" width="700"> | <img src="Assets/base-after.png" width="700"> |
 
 These screenshots are from inFAMOUS 2. I achieved the same result for inFAMOUS: Festival of Blood as well.
 
 ## Download
 **Please leave a star ⭐ if you found this repository helpful!**  
+📅 **13/09/2026:** Release 1.0.1 is here!
+
 You can download the compiled versions for your operating system here:  
 **[Download Latest Release.](https://github.com/adamstark1/inFAMOUS-Reborn-PS3/releases)**
 
 | UI Screenshot |
 | :---: |
-| <img src="Resources/infamous-reborn-ui.png" width="500"> |
+| <img src="Assets/infamous-reborn-ui.png" width="500"> |
 
 ## How to Run
 > [!NOTE]
 > The application was tested on Windows 11 and macOS Tahoe.
 ### Windows
-1. Extract the downloaded `.zip` file.
+1. Extract the downloaded `.zip` file or compile it yourself with `Compilers/build_windows.sh` (use [Git Bash](https://git-scm.com/install/) terminal).
 2. Run `inFAMOUSReborn.Launcher.exe`.
 
 ### macOS
-1. Extract the downloaded `.zip` file.
+1. Extract the downloaded `.zip` file or compile it yourself with `Compilers/build_mac_silicon.sh` or `Compilers/build_mac_intel.sh`.
 2. Double-click the `inFAMOUS Reborn.app` bundle. 
 
 
@@ -48,7 +50,7 @@ You can download the compiled versions for your operating system here:
 5. **Start Server:** Once the files are ready, click "Start Server". The terminal will display if the missions loaded successfully and your local IP address. Boot the game.
 
 ## Tips
-Fastest way to get all 3 UGC related trophies for **inFAMOUS 2**:
+🏆 Fastest way to get all 3 UGC related trophies for **inFAMOUS 2**:
 - Set **Mission Filters** to **Newest**, **Any**, **Any**.
 - Search for **"2 fast trophies"** and replay the mission 25 times.
 
@@ -72,6 +74,12 @@ Incorrect structure: `Missions/base/maps_by_name/[mission files]` (Remove the `m
 If the built-in port clearer fails, manually kill the conflicting processes:
 * **macOS:** Open Terminal and run `sudo kill -9 $(sudo lsof -t -i :80)`.
 * **Windows:** Open Command Prompt as Administrator and run `for /f "tokens=5" %a in ('netstat -aon ^| findstr :80 ^| findstr LISTENING') do taskkill /f /pid %a`.
+
+>**"Permission denied for compiler .sh scripts"**  
+Adjust permissions for these files manually:
+* **macOS (Intel):** use `chmod +x build_mac_intel.sh` in Terminal.
+* **macOS (Silicon):** use `chmod +x build_mac_silicon.sh` in Terminal.
+* **Windows:** use `chmod +x build_windows.sh` in Git Bash terminal.
 
 ## Tech Stack
 
