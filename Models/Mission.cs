@@ -66,4 +66,13 @@ public class Mission
 
     [JsonPropertyName("dataUrl")]
     public string DataUrl { get; set; } = string.Empty;
+    
+    [JsonIgnore]
+    public string RealId { get; set; } = string.Empty;
+
+    [JsonIgnore]
+    public string PhysicalFilePath { get; set; } = string.Empty;
+
+    [JsonIgnore]
+    public string WorldFolder { get; set; } = string.Empty;
 }

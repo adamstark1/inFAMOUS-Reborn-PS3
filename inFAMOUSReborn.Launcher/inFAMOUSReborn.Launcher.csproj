@@ -4,6 +4,9 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Product>inFAMOUS Reborn Launcher</Product>
+    <AssemblyTitle>inFAMOUS Reborn Launcher</AssemblyTitle>
+    <Title>inFAMOUS Reborn Launcher</Title>
   </PropertyGroup>
 
   <ItemGroup>
