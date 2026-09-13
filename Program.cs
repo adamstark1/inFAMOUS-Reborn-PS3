@@ -6,6 +6,9 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddFilter("Microsoft.AspNetCore", LogLevel.Warning);
 string pfxPath = Path.Combine(AppContext.BaseDirectory, "infamous.pfx");
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
@@ -460,6 +463,13 @@ app.MapGet("/api/missions/my/queue/index.json", () => Results.Json(new { mission
 app.MapGet("/api/missions/my/played/index.json", () => Results.Json(new { missions = new object[] {}, missionCount = 0 }));
 app.MapGet("/api/missions/my/uploaded/index.json", () => Results.Json(new { missions = new object[] {}, missionCount = 0 }));
 
-app.MapFallback((HttpContext context) => Results.Json(new { status = "ok" }));
+app.MapFallback(async (HttpContext context) => 
+{
+    if (context.Request.Body != null)
+    {
+        await context.Request.Body.CopyToAsync(Stream.Null);
+    }
+    return Results.Json(new { status = "ok" });
+});
 
 app.Run();
