@@ -10,6 +10,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using System.Linq;
+using System.Threading;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 
@@ -254,6 +255,7 @@ public partial class MainWindowViewModel : ObservableObject
             try { _serverProcess.Kill(true); } catch { }
             _serverProcess.Dispose();
             _serverProcess = null;
+            Log("Please leave a star ⭐ on this repository!");
         }
         SetStep(3);
     }
