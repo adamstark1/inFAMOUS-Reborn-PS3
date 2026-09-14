@@ -12,7 +12,7 @@ These screenshots are from inFAMOUS 2. I achieved the same result for inFAMOUS: 
 
 ## Download
 **Please leave a star ⭐ if you found this repository helpful!**  
-📅 **13/09/2026:** Release 1.0.1 is here!
+📅 **14/09/2026:** Release 1.0.2 is here!
 
 You can download the compiled versions for your operating system here:  
 **[Download Latest Release.](https://github.com/adamstark1/inFAMOUS-Reborn-PS3/releases)**
