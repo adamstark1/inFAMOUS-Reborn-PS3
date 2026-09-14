@@ -10,6 +10,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -27,8 +28,6 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty] private bool _isSortMenuVisible = false;
     [ObservableProperty] private int _selectedSortIndex = 0;
     
-    
-
     private int _step;
     private readonly string _missionsDir;
     private Process? _serverProcess;
@@ -36,6 +35,26 @@ public partial class MainWindowViewModel : ObservableObject
     public MainWindowViewModel()
     {
         _missionsDir = ResolveMissionsDirectory();
+        
+        try
+        {
+            string settingsPath = Path.Combine(_missionsDir, "server_settings.json");
+            if (File.Exists(settingsPath))
+            {
+                string json = File.ReadAllText(settingsPath);
+                using var doc = JsonDocument.Parse(json);
+                if (doc.RootElement.TryGetProperty("SortMode", out var prop))
+                {
+                    int savedMode = prop.GetInt32();
+                    if (savedMode >= 0 && savedMode < SortOptions.Length)
+                    {
+                        _selectedSortIndex = savedMode;
+                    }
+                }
+            }
+        }
+        catch { }
+
         SetStep(1);
     }
 

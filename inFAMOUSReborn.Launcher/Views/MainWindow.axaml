@@ -46,6 +46,10 @@
             <Setter Property="Padding" Value="4" />
             <Setter Property="Margin" Value="0,6,0,0" /> 
         </Style>
+        
+        <Style Selector="SelectableTextBlock">
+            <Setter Property="SelectionBrush" Value="#555555" />
+        </Style>
     </Window.Styles>
 
     <Grid RowDefinitions="Auto, *, 200">
