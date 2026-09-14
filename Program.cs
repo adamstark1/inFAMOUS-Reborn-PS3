@@ -272,24 +272,39 @@ app.MapGet("/{fileName}", (HttpContext context, string fileName, MissionCatalog 
     string requestedId = fileName.Replace(".ium", "", StringComparison.OrdinalIgnoreCase);
     string worldHeader = context.Request.Headers["world"].ToString();
     string worldFolder = (worldHeader == "1") ? "fob" : "base";
-
+    
     var mission = catalog.GetAllMissions().FirstOrDefault(m => 
+        string.Equals(m.Id, requestedId, StringComparison.OrdinalIgnoreCase));
+    
+    if (mission == null)
     {
-        var mId = GetRealMissionId(m, worldFolder);
-        return string.Equals(mId, requestedId, StringComparison.OrdinalIgnoreCase);
-    });
+        var cachedEntry = _realIdCache.FirstOrDefault(kvp => 
+            string.Equals(kvp.Value, requestedId, StringComparison.OrdinalIgnoreCase));
+            
+        if (cachedEntry.Key != null)
+        {
+            string[] parts = cachedEntry.Key.Split('_', 3);
+            if (parts.Length == 3)
+            {
+                string title = parts[1];
+                string author = parts[2];
+                mission = catalog.GetAllMissions().FirstOrDefault(m => 
+                    m.Title == title && m.Author == author);
+            }
+        }
+    }
 
     if (mission == null) 
     {
-        Console.WriteLine($"[Download] Mission ID not found in memory: {requestedId}");
+        Console.WriteLine($"[Download] Mission ID not found in memory or cache: {requestedId}");
         return Results.NotFound();
     }
 
-    string title = mission.Title ?? "";
-    string author = mission.Author ?? "";
+    string titleStr = mission.Title ?? "";
+    string authorStr = mission.Author ?? "";
     string baseFolderPath = Path.Combine(PathHelper.GetMissionsDirectory(), worldFolder);
     
-    string[] possibleNames = { $"{title} - {author}.ium", $"{title}.ium" };
+    string[] possibleNames = { $"{titleStr} - {authorStr}.ium", $"{titleStr}.ium" };
 
     foreach (var name in possibleNames)
     {
@@ -309,7 +324,7 @@ app.MapGet("/{fileName}", (HttpContext context, string fileName, MissionCatalog 
         }
     }
 
-    Console.WriteLine($"[Download] Physical file not found for: {title} - {author} in {worldFolder}");
+    Console.WriteLine($"[Download] Physical file not found for: {titleStr} - {authorStr} in {worldFolder}");
     return Results.NotFound();
 });
 
