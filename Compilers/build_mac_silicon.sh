@@ -2,7 +2,7 @@
 
 cd "$(dirname "$0")/.."
 
-VERSION="1.0.1"
+VERSION="1.0.2"
 
 echo "Compiling macOS Silicon (osx-arm64) build for version $VERSION..."
 

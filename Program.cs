@@ -359,13 +359,6 @@ var buildMissionListResponse = (IEnumerable<Mission> missionsToServe, string wor
         missionCount = resultMissions.Count
     };
 
-    /*
-    string jsonString = JsonSerializer.Serialize(responseObj, new JsonSerializerOptions { WriteIndented = true });
-    Console.WriteLine("\n=== OUTGOING JSON RESPONSE TO PS3 ===");
-    Console.WriteLine(jsonString);
-    Console.WriteLine("=====================================\n");
-    */
-
     return Results.Json(responseObj);
 };
 
@@ -403,27 +396,54 @@ app.MapGet("/fob/static/initial.json", (MissionCatalog catalog) =>
 var handleSearch = async (HttpContext context, MissionCatalog catalog) =>
 {
     string searchTerm = "";
+    int from = 0;
+    int size = 32;
+
     if (context.Request.HasFormContentType)
     {
         var form = await context.Request.ReadFormAsync();
-        searchTerm = form["q"].FirstOrDefault() ?? form["query"].FirstOrDefault() ?? form["term"].FirstOrDefault() ?? "";
+        
+        searchTerm = form["term"].FirstOrDefault() ?? form["q"].FirstOrDefault() ?? "";
+        
+        if (int.TryParse(form["from"].FirstOrDefault(), out int f)) from = f;
+        if (int.TryParse(form["size"].FirstOrDefault(), out int s)) size = s;
     }
 
     string worldHeader = context.Request.Headers["world"].ToString();
     string worldFolder = (worldHeader == "1") ? "fob" : "base";
+    string baseFolderPath = Path.Combine(PathHelper.GetMissionsDirectory(), worldFolder);
     
-    var allMissions = GetValidMissionsForWorld(catalog, worldFolder);
+    var query = catalog.GetAllMissions().AsEnumerable();
     
     if (!string.IsNullOrEmpty(searchTerm))
     {
-        allMissions = allMissions.Where(m => 
+        query = query.Where(m => 
             (m.Title?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false) ||
             (m.Author?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false) ||
-            m.Id.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+            (m.Id?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false)
         );
     }
 
-    return buildMissionListResponse(allMissions.Take(32).ToList(), worldFolder);
+    var finalMissions = query
+        .Skip(from)
+        .Where(m => 
+        {
+            string title = m.Title ?? "Unknown";
+            string author = m.Author ?? "Unknown";
+            string[] possibleNames = { $"{title} - {author}.ium", $"{title}.ium" };
+            
+            foreach (var name in possibleNames)
+            {
+                if (File.Exists(Path.Combine(baseFolderPath, name))) return true;
+                string cleanName = string.Join("_", name.Split(Path.GetInvalidFileNameChars()));
+                if (File.Exists(Path.Combine(baseFolderPath, cleanName))) return true;
+            }
+            return false;
+        })
+        .Take(size > 0 ? size : 32)
+        .ToList();
+
+    return buildMissionListResponse(finalMissions, worldFolder);
 };
 
 app.MapPost("/api/missions/search/index.json", handleSearch);
