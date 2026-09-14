@@ -16,4 +16,5 @@ temp_*/
 
 Missions/base/
 Missions/fob/
+Missions/server_settings.json
 appsettings.*

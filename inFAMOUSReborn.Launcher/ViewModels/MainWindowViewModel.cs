@@ -24,6 +24,10 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty] private string _primaryButtonText = "";
     [ObservableProperty] private string _terminalOutput = "inFAMOUS Reborn Setup initialized...\n";
     [ObservableProperty] private bool _isReadmeLinkVisible = true;
+    [ObservableProperty] private bool _isSortMenuVisible = false;
+    [ObservableProperty] private int _selectedSortIndex = 0;
+    
+    
 
     private int _step;
     private readonly string _missionsDir;
@@ -130,9 +134,26 @@ public partial class MainWindowViewModel : ObservableObject
         Process.Start(new ProcessStartInfo { FileName = "https://github.com/adamstark1/inFAMOUS-Reborn-PS3", UseShellExecute = true });
     }
 
+    public string[] SortOptions { get; } = { "Relevance (Default)", "Highest Rated", "Most Played", "Most Favorited" };
+    partial void OnSelectedSortIndexChanged(int value)
+    {
+        try
+        {
+            var settings = new { SortMode = value };
+            string json = System.Text.Json.JsonSerializer.Serialize(settings);
+            
+            string path = Path.Combine(_missionsDir, "server_settings.json");
+            File.WriteAllText(path, json);
+        
+            Log($"[Settings] Sort mode updated to: {SortOptions[value]}");
+        }
+        catch (Exception ex) { Log($"[Sort] Failed to save sort settings: {ex.Message}"); }
+    }
+
     private void SetStep(int step)
     {
         _step = step;
+        IsSortMenuVisible = (_step == 4);
         switch (_step)
         {
             case 1:

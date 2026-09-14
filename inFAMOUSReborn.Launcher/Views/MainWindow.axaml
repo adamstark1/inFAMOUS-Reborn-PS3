@@ -21,6 +21,31 @@
             <Setter Property="Background" Value="#555555" />
             <Setter Property="Foreground" Value="#CCCCCC" />
         </Style>
+        
+        <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Margin" Value="4,2"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#333333"/>
+        </Style>
+        <Style Selector="ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#4A4A4A"/>
+        </Style>
+        <Style Selector="ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="#555555"/>
+        </Style>
+        
+        <Style Selector="FlyoutPresenter">
+            <Setter Property="Background" Value="#252525" />
+            <Setter Property="BorderBrush" Value="#555555" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="Margin" Value="0,6,0,0" /> 
+        </Style>
     </Window.Styles>
 
     <Grid RowDefinitions="Auto, *, 200">
@@ -38,10 +63,34 @@
             <StackPanel HorizontalAlignment="Center" Spacing="20" VerticalAlignment="Center">
                 <TextBlock FontSize="16" MaxWidth="600" Text="{Binding StepDescription}" TextAlignment="Center" TextWrapping="Wrap"/>
                 
-                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="15">
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="8">
+                    
                     <Button Background="#FFFFFF" Command="{Binding ExecutePrimaryActionCommand}" Content="{Binding PrimaryButtonText}" CornerRadius="4" FontWeight="Bold" Foreground="#000000" Padding="30,12"/>
                     
                     <Button Background="Transparent" BorderBrush="#888888" BorderThickness="1" Command="{Binding SkipStepCommand}" Content="Skip" CornerRadius="4" FontWeight="Bold" Foreground="#888888" IsVisible="{Binding IsOptional}" Padding="20,12"/>
+                    
+                    <Button x:Name="SortButton"
+                            Content="Sort" 
+                            IsVisible="{Binding IsSortMenuVisible}" 
+                            Background="#2A2A2A" 
+                            Foreground="#FFFFFF" 
+                            BorderBrush="#555555" 
+                            BorderThickness="1" 
+                            CornerRadius="4" 
+                            FontWeight="Bold" 
+                            Padding="15,12">
+                        <Button.Flyout>
+                            <Flyout Placement="Bottom">
+                                <ListBox ItemsSource="{Binding SortOptions}" 
+                                         SelectedIndex="{Binding SelectedSortIndex}" 
+                                         SelectionChanged="SortMenu_SelectionChanged"
+                                         Background="Transparent" 
+                                         BorderThickness="0" 
+                                         Margin="-5"/>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                    
                 </StackPanel>
                 
                 <StackPanel HorizontalAlignment="Center" IsVisible="{Binding IsReadmeLinkVisible}" Margin="0,10,0,0" Orientation="Horizontal">

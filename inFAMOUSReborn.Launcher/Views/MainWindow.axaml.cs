@@ -18,6 +18,11 @@ public partial class MainWindow : Window
             }
         };
     }
+    private void SortMenu_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        var sortButton = this.FindControl<Button>("SortButton");
+        sortButton?.Flyout?.Hide();
+    }
 
     private void Vm_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {

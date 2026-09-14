@@ -439,6 +439,25 @@ var handleSearch = async (HttpContext context, MissionCatalog catalog) =>
         );
     }
 
+    int sortMode = 0;
+    try
+    {
+        string settingsPath = Path.Combine(PathHelper.GetMissionsDirectory(), "server_settings.json");
+        if (File.Exists(settingsPath))
+        {
+            using var fs = new FileStream(settingsPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var sr = new StreamReader(fs);
+            string json = await sr.ReadToEndAsync();
+            using var doc = JsonDocument.Parse(json);
+            sortMode = doc.RootElement.GetProperty("SortMode").GetInt32();
+        }
+    }
+    catch { }
+    
+    if (sortMode == 1) query = query.OrderByDescending(m => m.Rating);
+    else if (sortMode == 2) query = query.OrderByDescending(m => m.PlayTotal);
+    else if (sortMode == 3) query = query.OrderByDescending(m => m.FavoriteTotal);
+
     var finalMissions = query
         .Skip(from)
         .Where(m => 
