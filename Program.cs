@@ -482,6 +482,7 @@ app.MapGet("/api/missions/my/favorites/index.json", () => Results.Json(new { mis
 app.MapGet("/api/missions/my/queue/index.json", () => Results.Json(new { missions = new object[] {}, missionCount = 0 }));
 app.MapGet("/api/missions/my/played/index.json", () => Results.Json(new { missions = new object[] {}, missionCount = 0 }));
 app.MapGet("/api/missions/my/uploaded/index.json", () => Results.Json(new { missions = new object[] {}, missionCount = 0 }));
+app.MapGet("/api/missions/my/playlist/index.json", () => Results.Json(new { missions = new object[] {}, missionCount = 0 }));
 
 app.MapFallback(async (HttpContext context) => 
 {
