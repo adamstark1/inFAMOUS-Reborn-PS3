@@ -49,6 +49,14 @@ You can download the compiled versions for your operating system here:
 4. **Optional Step:** Open the **Internet Browser** on your PS3 and head to http://infamous2-release.ps3.online.scea.com/. If you see my message, you're perfectly set.
 5. **Start Server:** Once the files are ready, click "Start Server". The terminal will display if the missions loaded successfully and your local IP address. Boot the game.
 
+## Sponsors and Contributors
+I'd like to give a huge thank you to everyone who helped with this repository. This projects improves overtime thanks to you!
+
+❤️ **Sponsors:** [@ffv2-droid](https://github.com/ffv2-droid)  
+🛠️ **Troubleshooting:** [@CacturnatorCAN](https://github.com/CacturnatorCAN), [@ineed2remember-netizen](https://github.com/ineed2remember-netizen), [@f0cuswOw](https://github.com/f0cuswOw), [@saladthieves](https://github.com/saladthieves)
+
+You can support my coding journey and revival projects on [GitHub Sponsors](https://github.com/sponsors/adamstark1).
+
 ## Tips
 🏆 Fastest way to get all 3 UGC related trophies for **inFAMOUS 2**:
 - Set **Mission Filters** to **Newest**, **Any**, **Any**.
@@ -75,6 +83,8 @@ If the built-in port clearer fails, manually kill the conflicting processes:
 * **macOS:** Open Terminal and run `sudo kill -9 $(sudo lsof -t -i :80)`.
 * **Windows:** Open Command Prompt as Administrator and run `for /f "tokens=5" %a in ('netstat -aon ^| findstr :80 ^| findstr LISTENING') do taskkill /f /pid %a`.
 
+Executing one of these commands will free up Port 80, and the Launcher will function properly.
+
 >**"Permission denied for compiler .sh scripts"**  
 Adjust permissions for these files manually:
 * **macOS (Intel):** use `chmod +x build_mac_intel.sh` in Terminal.
@@ -82,7 +92,9 @@ Adjust permissions for these files manually:
 * **Windows:** use `chmod +x build_windows.sh` in Git Bash terminal.
 
 >**"ERROR: Read-only file system : '/private/var/folders/.../d/Missions'"**  
-**macOS(Intel / Silicon)**: Pressing the **Download & Extract** button may fail with an error due to Apple's [Gatekeeper](https://en.wikipedia.org/wiki/Gatekeeper_(macOS)) security feature. This can be fixed by moving the app bundle:
+This error can occur on macOS (Intel and Silicon):
+
+Pressing the **Download & Extract** button may fail with an error due to Apple's [Gatekeeper](https://en.wikipedia.org/wiki/Gatekeeper_(macOS)) security feature. This can be fixed by moving the app bundle:
 * Close the app first (`inFAMOUS Reborn.app`) if it's already running.
 * **Move** (*not copy*) the app to another location (e.g. `Desktop`) with a drag and drop.
 * **Move** the app back to the previous location with a drag and drop.
