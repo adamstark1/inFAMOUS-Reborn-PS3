@@ -81,6 +81,13 @@ Adjust permissions for these files manually:
 * **macOS (Silicon):** use `chmod +x build_mac_silicon.sh` in Terminal.
 * **Windows:** use `chmod +x build_windows.sh` in Git Bash terminal.
 
+>**"ERROR: Read-only file system : '/private/var/folders/.../d/Missions'"**  
+**macOS(Intel / Silicon)**: Pressing the **Download & Extract** button may fail with an error due to Apple's [Gatekeeper](https://en.wikipedia.org/wiki/Gatekeeper_(macOS)) security feature. This can be fixed by moving the app bundle:
+* Close the app first (`inFAMOUS Reborn.app`) if it's already running.
+* **Move** (*not copy*) the app to another location (e.g. `Desktop`) with a drag and drop.
+* **Move** the app back to the previous location with a drag and drop.
+* Reopen the app by double-clicking it and proceed as normal.
+
 ## Tech Stack
 
 ![C#](https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white)
