@@ -100,8 +100,6 @@ public partial class MainWindowViewModel : ObservableObject
         Dispatcher.UIThread.Post(() => TerminalOutput += $"[{DateTime.Now:HH:mm:ss}] {message}\n");
     }
 
-    // Updates `_terminalOutput` directly without appending. 
-    // Used by `ShowDownloadProgress()` to display a download progressbar.
     private void LogSet(string message)
     {
         Dispatcher.UIThread.Post(() => TerminalOutput = message);
@@ -327,121 +325,100 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     private async Task DownloadMissionsAsync()
-{
-    if (!Directory.Exists(_missionsDir)) Directory.CreateDirectory(_missionsDir);
-    using var client = new HttpClient();
-    client.Timeout = TimeSpan.FromMinutes(30);
+    {
+        if (!Directory.Exists(_missionsDir)) Directory.CreateDirectory(_missionsDir);
+        using var client = new HttpClient();
+        client.Timeout = TimeSpan.FromMinutes(30);
 
-    Log("Downloading inFAMOUS 2 base missions...");
-    var baseBytes = await DownloadMissionsBufferedAsync("https://archive.org/download/infamous-2-ugc/maps_by_name.zip", client);
-    string baseZip = Path.Combine(_missionsDir, "base.zip");
+        Log("Downloading inFAMOUS 2 base missions...");
+        var baseBytes = await DownloadMissionsBufferedAsync("https://archive.org/download/infamous-2-ugc/maps_by_name.zip", client);
+        string baseZip = Path.Combine(_missionsDir, "base.zip");
 
-    Log("  > Extracting .zip and copying base missions...");
-    await File.WriteAllBytesAsync(baseZip, baseBytes);
-    string tempBase = Path.Combine(_missionsDir, "temp_base");
-    ExtractZip(baseZip, tempBase);
-    string finalBase = Path.Combine(_missionsDir, "base");
-    if (Directory.Exists(finalBase)) Directory.Delete(finalBase, true);
-    Directory.Move(Path.Combine(tempBase, "maps_by_name"), finalBase);
-    Directory.Delete(tempBase, true);
+        Log("  > Extracting .zip and copying base missions...");
+        await File.WriteAllBytesAsync(baseZip, baseBytes);
+        
+        await Task.Run(() => 
+        {
+            string tempBase = Path.Combine(_missionsDir, "temp_base");
+            ExtractZip(baseZip, tempBase);
+            string finalBase = Path.Combine(_missionsDir, "base");
+            if (Directory.Exists(finalBase)) Directory.Delete(finalBase, true);
+            Directory.Move(Path.Combine(tempBase, "maps_by_name"), finalBase);
+            Directory.Delete(tempBase, true);
+        });
 
-    Log("Downloading base missions catalog...");
-    string baseCatalogUrl = "https://github.com/adamstark1/inFAMOUS-Reborn-PS3/raw/refs/heads/main/Missions/ugc_missions_base.json.gz";
-    var baseCatalogBytes = await DownloadMissionsBufferedAsync(baseCatalogUrl, client);
-    await File.WriteAllBytesAsync(Path.Combine(_missionsDir, "ugc_missions_base.json.gz"), baseCatalogBytes);
+        Log("Downloading base missions catalog...");
+        string baseCatalogUrl = "https://github.com/adamstark1/inFAMOUS-Reborn-PS3/raw/refs/heads/main/Missions/ugc_missions_base.json.gz";
+        var baseCatalogBytes = await DownloadMissionsBufferedAsync(baseCatalogUrl, client);
+        await File.WriteAllBytesAsync(Path.Combine(_missionsDir, "ugc_missions_base.json.gz"), baseCatalogBytes);
 
-    Log("Downloading Festival of Blood (FoB) missions...");
-    var fobBytes = await DownloadMissionsBufferedAsync("https://archive.org/download/infamous-fob-ugc/maps_by_name.zip", client);
-    string fobZip = Path.Combine(_missionsDir, "fob.zip");
+        Log("Downloading Festival of Blood (FoB) missions...");
+        var fobBytes = await DownloadMissionsBufferedAsync("https://archive.org/download/infamous-fob-ugc/maps_by_name.zip", client);
+        string fobZip = Path.Combine(_missionsDir, "fob.zip");
 
-    Log("  > Extracting .zip and copying FoB missions...");
-    await File.WriteAllBytesAsync(fobZip, fobBytes);
-    string tempFob = Path.Combine(_missionsDir, "temp_fob");
-    ExtractZip(fobZip, tempFob);
-    string finalFob = Path.Combine(_missionsDir, "fob");
-    if (Directory.Exists(finalFob)) Directory.Delete(finalFob, true);
-    Directory.Move(Path.Combine(tempFob, "maps_by_name"), finalFob);
-    Directory.Delete(tempFob, true);
+        Log("  > Extracting .zip and copying FoB missions...");
+        await File.WriteAllBytesAsync(fobZip, fobBytes);
+        
+        await Task.Run(() => 
+        {
+            string tempFob = Path.Combine(_missionsDir, "temp_fob");
+            ExtractZip(fobZip, tempFob);
+            string finalFob = Path.Combine(_missionsDir, "fob");
+            if (Directory.Exists(finalFob)) Directory.Delete(finalFob, true);
+            Directory.Move(Path.Combine(tempFob, "maps_by_name"), finalFob);
+            Directory.Delete(tempFob, true);
+        });
 
-    Log("Downloading FoB missions catalog...");
-    string fobCatalogUrl = "https://github.com/adamstark1/inFAMOUS-Reborn-PS3/raw/refs/heads/main/Missions/ugc_missions_fob.json.gz";
-    var fobCatalogBytes = await DownloadMissionsBufferedAsync(fobCatalogUrl, client);
-    await File.WriteAllBytesAsync(Path.Combine(_missionsDir, "ugc_missions_fob.json.gz"), fobCatalogBytes);
+        Log("Downloading FoB missions catalog...");
+        string fobCatalogUrl = "https://github.com/adamstark1/inFAMOUS-Reborn-PS3/raw/refs/heads/main/Missions/ugc_missions_fob.json.gz";
+        var fobCatalogBytes = await DownloadMissionsBufferedAsync(fobCatalogUrl, client);
+        await File.WriteAllBytesAsync(Path.Combine(_missionsDir, "ugc_missions_fob.json.gz"), fobCatalogBytes);
 
-    File.Delete(baseZip);
-    File.Delete(fobZip);
-    Log("Cleanup finished.");
-}
+        File.Delete(baseZip);
+        File.Delete(fobZip);
+        Log("Cleanup finished.");
+    }
 
-    // Download the given file URL and show progress during the download.
     private async Task<byte[]> DownloadMissionsBufferedAsync(string url, HttpClient client)
     {
-        // Fetch response and return as soon as the header data is available.
-        // This allows us to read the file size from the header and show it to
-        // the user when the download starts.
         using var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
         response.EnsureSuccessStatusCode();
 
-        // Get the size and make sure it's valid before proceeding forward.
         var size = response.Content.Headers.ContentLength ?? 0;
         if (size == 0)
         {
             throw new InvalidOperationException("Downloading file failed: [size = 0]");
         }
 
-        // Preallocate the size on the heap so that calls to `bytes.AddRange()`
-        // are O(1) without having to resize whenever Count >= Capacity.
-        // This reduces the amount of resizes from log2(size) to just zero.
-        var bytes = new List<byte>(Convert.ToInt32(size));
+        var bytes = new byte[(int)size];
+        int total = 0;
+        int readCount;
+        long totalInMb = 0L;
 
-        const long bufferSize = BytesInKb * 128;
-        var buffer = new byte[bufferSize];
-        var total = 0L;        // Downloaded so far (in bytes)
-        var totalInMb = 0L;    // Downloaded so far (in MB)
+        await using var stream = await response.Content.ReadAsStreamAsync();
 
-        // Start reading the download stream, 128 KB at a time.
-        await using (var stream = await response.Content.ReadAsStreamAsync())
+        while ((readCount = await stream.ReadAsync(bytes.AsMemory(total))) != 0)
         {
-            int readCount;
+            total += readCount;
 
-            do
-            {
-                // Write 128 KB from the stream into the buffer, returning the
-                // actual number of bytes read. This needed to keep track of the
-                // exact number of bytes read since `ReadAsync` may read less
-                // bytes than `buffer.Length`.
-                readCount = await stream.ReadAsync(buffer, 0, buffer.Length);
-                bytes.AddRange(readCount != bufferSize ? buffer[..readCount] : buffer);
-                total += readCount;
+            var newTotalInMb = total / BytesInMb;
+            if (newTotalInMb == totalInMb) continue;
 
-                // Update the total downloaded so far in MB.
-                // To avoid updating the UI too many times, the progressbar is
-                // only updated when the size in MB has changed.
-                var newTotalInMb = total / BytesInMb;
-                if (newTotalInMb == totalInMb) continue;
-
-                ShowDownloadProgress(total, size);
-                totalInMb = newTotalInMb;
-            } while (readCount != 0);
+            ShowDownloadProgress(total, size);
+            totalInMb = newTotalInMb;
         }
 
-        // Download has finished - both `total` and `size` are equal.
         ShowDownloadProgress(total, size);
 
-        return [.. bytes];
+        return bytes;
     }
 
-    // Shows an ASCII progress bar in the following format:
-    // [timestamp] [#####################...................] - {total} / {size} MB
-    // The `total` and `size` parameters are in bytes, and the progressbar shows
-    // them in MB.
     private void ShowDownloadProgress(long total, long size)
     {
         const char filled = '#';
         const char empty = '.';
         const int barLength = 40;
 
-        // Checked conversion for overflow
         var totalVal = Convert.ToDouble(total) / BytesInMb; 
         var sizeVal = Convert.ToDouble(size) / BytesInMb;
         
@@ -454,30 +431,20 @@ public partial class MainWindowViewModel : ObservableObject
         var sizeLine = $"{totalVal:N1} / {sizeVal:N1} MB";
         if (total == size)
         {
-            // Download has completed - append a visual 'Done'.
             sizeLine += " - Done.\n";
         }
 
-        // Final updated line
         var line = $"[{DateTime.Now:HH:mm:ss}] [{filledLine}{emptyLine}] {sizeLine}";
 
-        /*
-        Update the current `TerminalOutput` content.
-
-        If the last line inside `TerminalOutput` ends in " MB", then it was 
-        appended by `ShowDownloadProgress()`, so replace that entire last line 
-        with the updated `line` progress from above.
-        */
         var terminalContent = TerminalOutput;
         if (terminalContent.EndsWith(" MB"))
         {
-            // Replace the last line (after '\n') with the updated `line`.
             var lineFeedIndex = terminalContent.LastIndexOf('\n');
             if (lineFeedIndex != -1)
             {
                 terminalContent = terminalContent[..(lineFeedIndex + 1)];
                 terminalContent += line;
-                LogSet(terminalContent);  // Set `TerminalOutput` directly
+                LogSet(terminalContent);
             }
             else
             {
@@ -486,8 +453,6 @@ public partial class MainWindowViewModel : ObservableObject
         }
         else
         {
-            // Append the line normally but make sure it doesn't end in '\n' so
-            // that the above check with `EndsWith(" MB") succeeds next time.
             terminalContent += line;
             LogSet(terminalContent);
         }
