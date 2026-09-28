@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
@@ -31,6 +32,9 @@ public partial class MainWindowViewModel : ObservableObject
     private int _step;
     private readonly string _missionsDir;
     private Process? _serverProcess;
+
+    private const long BytesInKb = 1024;
+    private const long BytesInMb = BytesInKb * 1024;
 
     public MainWindowViewModel()
     {
@@ -94,6 +98,11 @@ public partial class MainWindowViewModel : ObservableObject
     private void Log(string message)
     {
         Dispatcher.UIThread.Post(() => TerminalOutput += $"[{DateTime.Now:HH:mm:ss}] {message}\n");
+    }
+
+    private void LogSet(string message)
+    {
+        Dispatcher.UIThread.Post(() => TerminalOutput = message);
     }
 
     [RelayCommand]
@@ -316,49 +325,138 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     private async Task DownloadMissionsAsync()
-{
-    if (!Directory.Exists(_missionsDir)) Directory.CreateDirectory(_missionsDir);
-    using var client = new HttpClient();
-    client.Timeout = TimeSpan.FromMinutes(30);
-    
-    Log("Downloading inFAMOUS 2 missions, please wait...");
-    var baseBytes = await client.GetByteArrayAsync("https://archive.org/download/infamous-2-ugc/maps_by_name.zip");
-    string baseZip = Path.Combine(_missionsDir, "base.zip");
-    await File.WriteAllBytesAsync(baseZip, baseBytes);
-    
-    Log("Extracting Base missions .zip...");
-    string tempBase = Path.Combine(_missionsDir, "temp_base");
-    ExtractZip(baseZip, tempBase);
-    string finalBase = Path.Combine(_missionsDir, "base");
-    if (Directory.Exists(finalBase)) Directory.Delete(finalBase, true);
-    Directory.Move(Path.Combine(tempBase, "maps_by_name"), finalBase);
-    Directory.Delete(tempBase, true);
-    
-    string baseCatalogUrl = "https://github.com/adamstark1/inFAMOUS-Reborn-PS3/raw/refs/heads/main/Missions/ugc_missions_base.json.gz";
-    var baseCatalogBytes = await client.GetByteArrayAsync(baseCatalogUrl);
-    await File.WriteAllBytesAsync(Path.Combine(_missionsDir, "ugc_missions_base.json.gz"), baseCatalogBytes);
-    
-    Log("Downloading Festival of Blood missions, please wait...");
-    var fobBytes = await client.GetByteArrayAsync("https://archive.org/download/infamous-fob-ugc/maps_by_name.zip");
-    string fobZip = Path.Combine(_missionsDir, "fob.zip");
-    await File.WriteAllBytesAsync(fobZip, fobBytes);
-    
-    Log("Extracting FoB missions .zip...");
-    string tempFob = Path.Combine(_missionsDir, "temp_fob");
-    ExtractZip(fobZip, tempFob);
-    string finalFob = Path.Combine(_missionsDir, "fob");
-    if (Directory.Exists(finalFob)) Directory.Delete(finalFob, true);
-    Directory.Move(Path.Combine(tempFob, "maps_by_name"), finalFob);
-    Directory.Delete(tempFob, true);
-    
-    string fobCatalogUrl = "https://github.com/adamstark1/inFAMOUS-Reborn-PS3/raw/refs/heads/main/Missions/ugc_missions_fob.json.gz";
-    var fobCatalogBytes = await client.GetByteArrayAsync(fobCatalogUrl);
-    await File.WriteAllBytesAsync(Path.Combine(_missionsDir, "ugc_missions_fob.json.gz"), fobCatalogBytes);
-    
-    File.Delete(baseZip);
-    File.Delete(fobZip);
-    Log("Cleanup finished.");
-}
+    {
+        if (!Directory.Exists(_missionsDir)) Directory.CreateDirectory(_missionsDir);
+        using var client = new HttpClient();
+        client.Timeout = TimeSpan.FromMinutes(30);
+
+        Log("Downloading inFAMOUS 2 base missions...");
+        var baseBytes = await DownloadMissionsBufferedAsync("https://archive.org/download/infamous-2-ugc/maps_by_name.zip", client);
+        string baseZip = Path.Combine(_missionsDir, "base.zip");
+
+        Log("  > Extracting .zip and copying base missions...");
+        await File.WriteAllBytesAsync(baseZip, baseBytes);
+        
+        await Task.Run(() => 
+        {
+            string tempBase = Path.Combine(_missionsDir, "temp_base");
+            ExtractZip(baseZip, tempBase);
+            string finalBase = Path.Combine(_missionsDir, "base");
+            if (Directory.Exists(finalBase)) Directory.Delete(finalBase, true);
+            Directory.Move(Path.Combine(tempBase, "maps_by_name"), finalBase);
+            Directory.Delete(tempBase, true);
+        });
+
+        Log("Downloading base missions catalog...");
+        string baseCatalogUrl = "https://github.com/adamstark1/inFAMOUS-Reborn-PS3/raw/refs/heads/main/Missions/ugc_missions_base.json.gz";
+        var baseCatalogBytes = await DownloadMissionsBufferedAsync(baseCatalogUrl, client);
+        await File.WriteAllBytesAsync(Path.Combine(_missionsDir, "ugc_missions_base.json.gz"), baseCatalogBytes);
+
+        Log("Downloading Festival of Blood (FoB) missions...");
+        var fobBytes = await DownloadMissionsBufferedAsync("https://archive.org/download/infamous-fob-ugc/maps_by_name.zip", client);
+        string fobZip = Path.Combine(_missionsDir, "fob.zip");
+
+        Log("  > Extracting .zip and copying FoB missions...");
+        await File.WriteAllBytesAsync(fobZip, fobBytes);
+        
+        await Task.Run(() => 
+        {
+            string tempFob = Path.Combine(_missionsDir, "temp_fob");
+            ExtractZip(fobZip, tempFob);
+            string finalFob = Path.Combine(_missionsDir, "fob");
+            if (Directory.Exists(finalFob)) Directory.Delete(finalFob, true);
+            Directory.Move(Path.Combine(tempFob, "maps_by_name"), finalFob);
+            Directory.Delete(tempFob, true);
+        });
+
+        Log("Downloading FoB missions catalog...");
+        string fobCatalogUrl = "https://github.com/adamstark1/inFAMOUS-Reborn-PS3/raw/refs/heads/main/Missions/ugc_missions_fob.json.gz";
+        var fobCatalogBytes = await DownloadMissionsBufferedAsync(fobCatalogUrl, client);
+        await File.WriteAllBytesAsync(Path.Combine(_missionsDir, "ugc_missions_fob.json.gz"), fobCatalogBytes);
+
+        File.Delete(baseZip);
+        File.Delete(fobZip);
+        Log("Cleanup finished.");
+    }
+
+    private async Task<byte[]> DownloadMissionsBufferedAsync(string url, HttpClient client)
+    {
+        using var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+        response.EnsureSuccessStatusCode();
+
+        var size = response.Content.Headers.ContentLength ?? 0;
+        if (size == 0)
+        {
+            throw new InvalidOperationException("Downloading file failed: [size = 0]");
+        }
+
+        var bytes = new byte[(int)size];
+        int total = 0;
+        int readCount;
+        long totalInMb = 0L;
+
+        await using var stream = await response.Content.ReadAsStreamAsync();
+
+        while ((readCount = await stream.ReadAsync(bytes.AsMemory(total))) != 0)
+        {
+            total += readCount;
+
+            var newTotalInMb = total / BytesInMb;
+            if (newTotalInMb == totalInMb) continue;
+
+            ShowDownloadProgress(total, size);
+            totalInMb = newTotalInMb;
+        }
+
+        ShowDownloadProgress(total, size);
+
+        return bytes;
+    }
+
+    private void ShowDownloadProgress(long total, long size)
+    {
+        const char filled = '#';
+        const char empty = '.';
+        const int barLength = 40;
+
+        var totalVal = Convert.ToDouble(total) / BytesInMb; 
+        var sizeVal = Convert.ToDouble(size) / BytesInMb;
+        
+        var progress = totalVal / sizeVal;
+        var progressLength = (int)(progress * barLength);
+
+        var filledLine = new string(filled, progressLength);
+        var emptyLine = new string(empty, barLength - progressLength);
+        
+        var sizeLine = $"{totalVal:N1} / {sizeVal:N1} MB";
+        if (total == size)
+        {
+            sizeLine += " - Done.\n";
+        }
+
+        var line = $"[{DateTime.Now:HH:mm:ss}] [{filledLine}{emptyLine}] {sizeLine}";
+
+        var terminalContent = TerminalOutput;
+        if (terminalContent.EndsWith(" MB"))
+        {
+            var lineFeedIndex = terminalContent.LastIndexOf('\n');
+            if (lineFeedIndex != -1)
+            {
+                terminalContent = terminalContent[..(lineFeedIndex + 1)];
+                terminalContent += line;
+                LogSet(terminalContent);
+            }
+            else
+            {
+                Log(line);
+            }
+        }
+        else
+        {
+            terminalContent += line;
+            LogSet(terminalContent);
+        }
+    }
 
     private void ExtractZip(string zipPath, string outputFolder)
     {
