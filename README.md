@@ -12,7 +12,7 @@ These screenshots are from inFAMOUS 2. I achieved the same result for inFAMOUS: 
 
 ## Download
 **Please leave a star ⭐ if you found this repository helpful!**  
-📅 **14/09/2026:** Release 1.0.2 is here!
+📅 **29/09/2026:** Release 1.0.3 is here!
 
 You can download the compiled versions for your operating system here:  
 **[Download Latest Release.](https://github.com/adamstark1/inFAMOUS-Reborn-PS3/releases)**
@@ -23,7 +23,7 @@ You can download the compiled versions for your operating system here:
 
 ## How to Run
 > [!NOTE]
-> The application was tested on Windows 11 and macOS Tahoe.
+> The application was tested on Windows 11, macOS Tahoe and Ubuntu 22.04.
 ### Windows
 1. Extract the downloaded `.zip` file or compile it yourself with `Compilers/build_windows.sh` (use [Git Bash](https://git-scm.com/install/) terminal).
 2. Run `inFAMOUSReborn.Launcher.exe`.
@@ -31,6 +31,10 @@ You can download the compiled versions for your operating system here:
 ### macOS
 1. Extract the downloaded `.zip` file or compile it yourself with `Compilers/build_mac_silicon.sh` or `Compilers/build_mac_intel.sh`.
 2. Double-click the `inFAMOUS Reborn.app` bundle. 
+
+### Linux
+1. Extract the downloaded `.zip` file or compile it yourself with `Compilers/build_linux.sh` and run `install.sh`.
+2. Run `inFAMOUS Reborn` from application menu. 
 
 
 ## Setup Instructions
@@ -81,6 +85,7 @@ Incorrect structure: `Missions/base/maps_by_name/[mission files]` (Remove the `m
 >**"Port 53 or Port 80 in use / Server fails to start"**  
 If the built-in port clearer fails, manually kill the conflicting processes:
 * **macOS:** Open Terminal and run `sudo kill -9 $(sudo lsof -t -i :80)`.
+* **Linux:** Open Terminal and run `sudo fuser -k 80/tcp 53/udp`.
 * **Windows:** Open Command Prompt as Administrator and run `for /f "tokens=5" %a in ('netstat -aon ^| findstr :80 ^| findstr LISTENING') do taskkill /f /pid %a`.
 
 Executing one of these commands will free up Port 80, and the Launcher will function properly.
@@ -89,6 +94,7 @@ Executing one of these commands will free up Port 80, and the Launcher will func
 Adjust permissions for these files manually:
 * **macOS (Intel):** use `chmod +x build_mac_intel.sh` in Terminal.
 * **macOS (Silicon):** use `chmod +x build_mac_silicon.sh` in Terminal.
+* **Linux:** use `chmod +x build_linux.sh` in Terminal.
 * **Windows:** use `chmod +x build_windows.sh` in Git Bash terminal.
 
 >**"ERROR: Read-only file system : '/private/var/folders/.../d/Missions'"**  
