@@ -2,10 +2,11 @@
 
 cd "$(dirname "$0")/.."
 
+VERSION="1.0.3"
 OUT_DIR="inFAMOUS Reborn Windows"
 ICON_PATH="Assets/icon.ico"
 
-echo "Compiling Windows build..."
+echo "Compiling Windows build for version $VERSION..."
 
 rm -rf "$OUT_DIR"
 mkdir -p "$OUT_DIR"

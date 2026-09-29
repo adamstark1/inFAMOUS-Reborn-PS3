@@ -10,6 +10,7 @@ obj/
 
 inFAMOUS Reborn.app/
 inFAMOUS Reborn Windows/
+inFAMOUS Reborn Linux/
 ReleaseBuild/
 temp_*/
 *.zip
