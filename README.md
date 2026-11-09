@@ -28,6 +28,7 @@ I managed to restore the Platinum trophies for these games with the help of some
 - [Darksiders 2](https://github.com/adamstark1/Darksiders2-Reborn-PS3)
 - [Saints Row: The Third](https://github.com/adamstark1/SaintsRow-Reborn-PS3)
 - [Saints Row IV](https://github.com/adamstark1/SaintsRow-Reborn-PS3)
+- [Shaun White Snowboarding](https://github.com/adamstark1/ShaunWhite-Reborn-PS3)
 
 
 ## How to Run
